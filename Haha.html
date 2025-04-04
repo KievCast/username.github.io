@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAHA Countdown Race</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: black;
+            color: lime;
+            text-align: center;
+            overflow: hidden;
+        }
+        .timer-container {
+            margin-top: 20px;
+        }
+        #race-track {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: gray;
+            border: 3px solid white;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .racer {
+            position: absolute;
+            bottom: 10px;
+            width: 50px;
+            image-rendering: pixelated;
+        }
+        #white-hat { left: 10px; }
+        #black-hat { left: 10px; top: 50px; }
+        .winner {
+            transform: scale(2);
+            animation: dance 0.5s infinite alternate;
+        }
+        @keyframes dance {
+            0% { transform: translateY(0) scale(2); }
+            100% { transform: translateY(-10px) scale(2); }
+        }
+        #qr-code {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Houston Area Hunters Anonymous Countdown</h1>
+    <div class="timer-container">
+        <input type="number" id="countdown-input" placeholder="Enter seconds">
+        <button onclick="startRace()">Start Race</button>
+        <h2 id="timer-display">00:00</h2>
+    </div>
+    
+    <div id="race-track">
+        <img id="white-hat" class="racer" src="https://i.imgur.com/MC7g9hC.png" alt="White Hat">
+        <img id="black-hat" class="racer" src="https://i.imgur.com/oHNuqgb.png" alt="Black Hat">
+    </div>
+
+    <h2 id="winner-text"></h2>
+
+    <div id="qr-code">
+        <p>Join our Discord:</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://discord.gg/GFrUgXnw" alt="Discord QR Code">
+    </div>
+
+    <script>
+        let countdown;
+        let raceInterval;
+        let raceTime;
+        const whiteHat = document.getElementById("white-hat");
+        const blackHat = document.getElementById("black-hat");
+        const timerDisplay = document.getElementById("timer-display");
+        const winnerText = document.getElementById("winner-text");
+
+        function startRace() {
+            let time = parseInt(document.getElementById("countdown-input").value);
+            if (isNaN(time) || time <= 0) {
+                alert("Enter a valid countdown time!");
+                return;
+            }
+
+            // Reset Race
+            whiteHat.style.left = "10px";
+            blackHat.style.left = "10px";
+            winnerText.innerText = "";
+            whiteHat.classList.remove("winner");
+            blackHat.classList.remove("winner");
+
+            // Start Countdown
+            raceTime = time;
+            timerDisplay.innerText = formatTime(time);
+            countdown = setInterval(updateTimer, 1000);
+            raceInterval = setInterval(moveRacers, 100);
+        }
+
+        function updateTimer() {
+            raceTime--;
+            timerDisplay.innerText = formatTime(raceTime);
+
+            if (raceTime <= 0) {
+                clearInterval(countdown);
+                clearInterval(raceInterval);
+                declareWinner();
+            }
+        }
+
+        function moveRacers() {
+            let whiteMove = Math.random() * 5;
+            let blackMove = Math.random() * 5;
+
+            whiteHat.style.left = (whiteHat.offsetLeft + whiteMove) + "px";
+            blackHat.style.left = (blackHat.offsetLeft + blackMove) + "px";
+        }
+
+        function declareWinner() {
+            let winner = Math.random() < 0.5 ? "white" : "black";
+            winnerText.innerText = winner.toUpperCase() + " HAT WINS!";
+            
+            if (winner === "white") {
+                whiteHat.classList.add("winner");
+            } else {
+                blackHat.classList.add("winner");
+            }
+        }
+
+        function formatTime(seconds) {
+            let mins = Math.floor(seconds / 60);
+            let secs = seconds % 60;
+            return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        }
+    </script>
+</body>
+</html>
